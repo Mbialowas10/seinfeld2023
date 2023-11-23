@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-${UID:-1000}}
+    ports:
+      - "3000:3000"
+    environment:
+      - RAILS_MASTER_KEY=$RAILS_MASTER_KEY
+      - DATABASE_URL=postgres://postgres:root@postgres-db/
+      #- DATABASE_URL=sqlite3:/var/lib/db/production.sqlite3 # Set the database URL for SQLite3
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  postgres-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: seinfeld2023
+    volumes:
+      #- ./tmp/db:/var/lib/postgresql/data
+      - ./tmp/db:/var/lib/db  # Mount a volume for SQLite database storage
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready
+      interval: 2s
+      timeout: 5s
+      retries: 30

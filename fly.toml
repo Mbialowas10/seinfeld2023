@@ -1,0 +1,45 @@
+# fly.toml app configuration file generated for seinfeld-2023-not-original-falling-surf-853 on 2023-11-16T14:18:03-06:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "seinfeld-2023-not-original-falling-surf-853"
+primary_region = "yul"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+console_command = "/rails/bin/rails console"
+
+[build]
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[statics]]
+  guest_path = "/rails/public"
+  url_prefix = "/"
+[deploy]
+  release_command = "./bin/rails db:prepare"
+
