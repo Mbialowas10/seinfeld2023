@@ -19,6 +19,10 @@ ENV SECRET_KEY_BASE="abc123456"
 RUN gem update --system --no-document && \
     gem install -N bundler
 
+# Install dos2unix
+RUN apt-get update && \
+    apt-get install -y dos2unix && \
+    rm -rf /var/lib/apt/lists/*
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
@@ -35,6 +39,9 @@ RUN bundle install && \
 
 # Copy application code
 COPY --link . .
+
+# Run dos2unix on the files with inconsistent line endings
+RUN find . -type f -exec dos2unix {} \;
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
