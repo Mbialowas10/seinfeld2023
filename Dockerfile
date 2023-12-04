@@ -10,8 +10,8 @@ LABEL fly_launch_runtime="rails"
 WORKDIR /rails
 
 # Set production environment
-ENV RAILS_ENV="development"
-    #BUNDLE_WITHOUT="development:test"
+ENV RAILS_ENV="production" \
+    BUNDLE_WITHOUT="development:test"
 ENV BUNDLE_DEPLOYMENT="1"
 ENV SECRET_KEY_BASE="abc123456"
 
@@ -47,7 +47,7 @@ RUN find . -type f -exec dos2unix {} \;
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE=DUMMY ./bin/rails assets:precompile
+# RUN SECRET_KEY_BASE=DUMMY ./bin/rails assets:precompile
 
 
 # Final stage for app image
